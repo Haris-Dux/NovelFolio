@@ -7,6 +7,7 @@ import cors from "cors";
 import dbConnection from "./src/dbConn/index";
 import corsOptions from "./src/config/cors/cors";
 import { LostErrorHandler,AppErrorHandler } from "./src/config/exceptionHandlers/handler";
+import UserModel from "./src/models/User";
 
 
 //   INITIALIZE EXPRESS APPLICATION

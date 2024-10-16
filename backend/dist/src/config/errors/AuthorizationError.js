@@ -22,8 +22,8 @@ var _AuthorizationError_instances, _AuthorizationError_stringifyAuthParams;
 Object.defineProperty(exports, "__esModule", { value: true });
 const CustomError_1 = __importDefault(require("./CustomError"));
 class AuthorizationError extends CustomError_1.default {
-    constructor(message, statusCode, feedback, authParams) {
-        super(message, statusCode || 401, feedback);
+    constructor(message, statusCode, authParams) {
+        super(message, statusCode || 401);
         _AuthorizationError_instances.add(this);
         this.authorizationError = true;
         this.authParams = authParams;

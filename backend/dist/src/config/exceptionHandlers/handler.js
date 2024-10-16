@@ -15,6 +15,5 @@ function AppErrorHandler(err, req, res, next) {
         res.set(err.authHeaders);
     }
     const error = (err === null || err === void 0 ? void 0 : err.cause) || (err === null || err === void 0 ? void 0 : err.message);
-    const providedFeedback = err === null || err === void 0 ? void 0 : err.feedback;
-    res.json(Object.assign({ error }, (providedFeedback && { feedback: providedFeedback })));
+    res.json(error);
 }

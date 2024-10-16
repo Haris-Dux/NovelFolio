@@ -6,12 +6,10 @@ import { Request, Response, NextFunction  } from "express";
   authorizationError?: boolean;
   authHeaders?: { [key: string]: string };
   cause?: any;
-  feedback?: string;
 }
 
 function LostErrorHandler(req: Request, res: Response, next: NextFunction) {
   res.status(404);
-
   res.json({
     error: "Resource not found",
   });
@@ -25,9 +23,7 @@ function AppErrorHandler(err:CustomError, req: Request, res: Response, next: Nex
     res.set(err.authHeaders);
   }
   const error = err?.cause || err?.message;
-  const providedFeedback = err?.feedback;
-
-  res.json({ error, ...(providedFeedback && { feedback: providedFeedback }) });
+  res.json(error);
 }
 
 export { LostErrorHandler, AppErrorHandler };

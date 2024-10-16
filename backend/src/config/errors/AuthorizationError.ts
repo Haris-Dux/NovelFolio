@@ -6,8 +6,8 @@ authParams?:{ [key: string]: any }
 authHeaders?: { [key: string]: string } 
 authorizationError: boolean; 
    
-  constructor(message:any, statusCode:Number , feedback:string, authParams:{ [key: string]: any } ) {
-    super(message, statusCode || 401, feedback); 
+  constructor(message:any, statusCode:Number , authParams:{ [key: string]: any } ) {
+    super(message, statusCode || 401); 
     this.authorizationError = true;
     this.authParams = authParams;
     this.authHeaders = {
