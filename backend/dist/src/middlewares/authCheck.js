@@ -22,7 +22,7 @@ const requireAuthentication = (req, res, next) => __awaiter(void 0, void 0, void
     try {
         const authHeader = req.header("Authorization");
         if (!(authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith("Bearer ")))
-            throw new AuthorizationError_1.default("Authentication Error", 401, "You are unauthenticated!", {
+            throw new AuthorizationError_1.default("Authentication Error", 401, {
                 error: "invalid_access_token",
                 error_description: "unknown authentication scheme",
             });
@@ -39,10 +39,10 @@ const requireAuthentication = (req, res, next) => __awaiter(void 0, void 0, void
         console.log(err);
         const expParams = {
             error: "expired_access_token",
-            error_description: "access token is expired",
+            error_description: "Access token is expired",
         };
         if (err.name === "TokenExpiredError")
-            return next(new AuthorizationError_1.default("Authentication Error", 401, "Token lifetime exceeded!", expParams));
+            return next(new AuthorizationError_1.default("Authentication Error", 401, expParams));
         next(err);
     }
 });

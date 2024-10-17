@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const CustomError_1 = __importDefault(require("../config/errors/CustomError"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -50,16 +49,6 @@ UserSchema.pre("save", function (next) {
             next(error);
         }
     });
-});
-//ATTACH CUSTOM STATIC METHODS  
-UserSchema.statics.findByCredentials = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield UserModel.findOne({ email });
-    if (!user)
-        throw new CustomError_1.default("Wrong credentials!", 400);
-    const passwdMatch = yield bcrypt_1.default.compare(password, user.password);
-    if (!passwdMatch)
-        throw new CustomError_1.default("Wrong credentials!", 400);
-    return user;
 });
 UserSchema.methods.generateAcessToken = function () {
     const user = this;

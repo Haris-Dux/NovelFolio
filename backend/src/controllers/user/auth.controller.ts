@@ -1,12 +1,18 @@
 import { verifyrequiredparams } from "../../middlewares/common";
 import { NextFunction, Request, Response } from "express";
-import UserModel from "../../models/User";
+import UserModel, { IUser } from "../../models/User";
+import CustomError from "../../config/errors/CustomError";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { AuthenticatedRequest } from "../../middlewares/authCheck";
+import AuthorizationError from "../../config/errors/AuthorizationError";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 
 
 // Top-level constants
 const REFRESH_TOKEN = {
-  secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
+  secret: process.env.AUTH_REFRESH_TOKEN_SECRET as string,
   cookie: {
     name: "refreshTkn",
     options: {
@@ -21,20 +27,27 @@ const REFRESH_TOKEN = {
 //SIGN UP USER 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password }:IUser = req.body;
     await verifyrequiredparams(req.body,['firstName', 'lastName','email','password',]);
+
+    //check registerd emial
+    const emailtocheck = email.toLowerCase();
+    const userExists = await UserModel.findOne({ email: emailtocheck })
+    if (userExists) {
+        throw new CustomError("User already exists",400);
+    }
 
     /* Custom methods on newUser are defined in User model */
     const newUser = new UserModel({ firstName, lastName, email, password });
     await newUser.save(); // Save new User to DB
-    const aTkn = await newUser.generateAcessToken(); // Create Access Token
+    const aTkn = newUser.generateAcessToken(); // Create Access Token
     const refreshToken = await newUser.generateRefreshToken(); // Create Refresh Token
 
     // SET refresh Token cookie in response
     res.cookie(
       REFRESH_TOKEN.cookie.name,
       refreshToken,
-      REFRESH_TOKEN.cookie.options
+      REFRESH_TOKEN.cookie.options as Object
     );
 
     // Send Response on successful Sign Up
@@ -53,20 +66,31 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 //LOGIN USER
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = verifyrequiredparams(req);
-  
-    const { email, password } = req.body;
+    const { email, password }:IUser = req.body;
+    await verifyrequiredparams(req.body,['email','password']);
 
+    //verify email and password
+    const user = await UserModel.findOne({ email });
+    if (!user)
+      throw new CustomError(
+        "Wrong credentials!",
+        400,
+      );
+    const passwdMatch = await bcrypt.compare(password, user.password);
+    if (!passwdMatch)
+      throw new CustomError(
+        "Wrong credentials!",
+        400,
+      );
     /* Custom methods on user are defined in User model */
-    const user = await User.findByCredentials(email, password); // Identify and retrieve user by credentials
-    const aTkn = await user.generateAcessToken(); // Create Access Token
+    const aTkn =  user.generateAcessToken(); // Create Access Token
     const refreshToken = await user.generateRefreshToken(); // Create Refresh Token
 
     // SET refresh Token cookie in response
     res.cookie(
       REFRESH_TOKEN.cookie.name,
       refreshToken,
-      REFRESH_TOKEN.cookie.options
+      REFRESH_TOKEN.cookie.options as Object
     );
 
     // Send Response on successful Login
@@ -81,21 +105,14 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+
 //LOGOUT USER
-const logout = async (req, res, next) => {
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Authenticated user ID attached on `req` by authentication middleware
-    const userId = req.userId;
-    const user = await User.findById(userId);
-
-    const cookies = req.cookies;
-    const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
-    // Create a refresh token hash
-    const rTknHash = crypto
-      .createHmac("sha256", REFRESH_TOKEN.secret)
-      .update(refreshToken)
-      .digest("hex");
-    user.tokens = user.tokens.filter((tokenObj) => tokenObj.token !== rTknHash);
+    const userId = (req as AuthenticatedRequest).userId;
+    const user:any  = await UserModel.findById(userId);
+     user.refreshToken = ""
     await user.save();
 
     // Set cookie expiry option to past date so it is destroyed
@@ -108,7 +125,7 @@ const logout = async (req, res, next) => {
     );
 
     // Destroy refresh token cookie with `expireCookieOptions` containing a past date
-    res.cookie(REFRESH_TOKEN.cookie.name, "", expireCookieOptions);
+    res.cookie(REFRESH_TOKEN.cookie.name, "", expireCookieOptions as Object);
     res.status(205).json({
       success: true,
     });
@@ -119,13 +136,12 @@ const logout = async (req, res, next) => {
 };
 
 //LOGOUT USER FROM ALL DEVICES
-const logoutAllDevices = async (req, res, next) => {
+export const logoutAllDevices = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Authenticated user ID attached on `req` by authentication middleware
-    const userId = req.userId;
-    const user = await User.findById(userId);
-
-    user.tokens = undefined;
+    const userId = (req as AuthenticatedRequest).userId;
+    const user:any = await UserModel.findById(userId);
+    user.refreshToken = "";
     await user.save();
 
     // Set cookie expiry to past date to mark for destruction
@@ -138,7 +154,7 @@ const logoutAllDevices = async (req, res, next) => {
     );
 
     // Destroy refresh token cookie
-    res.cookie(REFRESH_TOKEN.cookie.name, "", expireCookieOptions);
+    res.cookie(REFRESH_TOKEN.cookie.name, "", expireCookieOptions as Object);
     res.status(205).json({
       success: true,
     });
@@ -149,7 +165,7 @@ const logoutAllDevices = async (req, res, next) => {
 };
 
 //REGENERATE NEW ACCESS TOKEN
-const refreshAccessToken = async (req, res, next) => {
+export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cookies = req.cookies;
     const refreshToken = cookies[REFRESH_TOKEN.cookie.name];
@@ -157,8 +173,7 @@ const refreshAccessToken = async (req, res, next) => {
     if (!refreshToken) {
       throw new AuthorizationError(
         "Authentication error!",
-        undefined,
-        "You are unauthenticated",
+        401,
         {
           realm: "Obtain new Access Token",
           error: "no_rft",
@@ -167,27 +182,28 @@ const refreshAccessToken = async (req, res, next) => {
       );
     }
 
-    const decodedRefreshTkn = jwt.verify(refreshToken, REFRESH_TOKEN.secret);
+    const decodedRefreshTkn = jwt.verify(refreshToken, REFRESH_TOKEN.secret );
+
     const rTknHash = crypto
       .createHmac("sha256", REFRESH_TOKEN.secret)
       .update(refreshToken)
       .digest("hex");
-    const userWithRefreshTkn = await User.findOne({
-      _id: decodedRefreshTkn._id,
+
+    const userWithRefreshTkn = await UserModel.findOne({
+      _id: (decodedRefreshTkn as JwtPayload )._id,
       "tokens.token": rTknHash,
     });
     if (!userWithRefreshTkn)
       throw new AuthorizationError(
         "Authentication Error",
-        undefined,
-        "You are unauthenticated!",
+        401,
         {
           realm: "Obtain new Access Token",
         }
       );
 
     // GENERATE NEW ACCESSTOKEN
-    const newAtkn = await userWithRefreshTkn.generateAcessToken();
+    const newAtkn =  userWithRefreshTkn.generateAcessToken();
 
     res.status(201);
     res.set({ "Cache-Control": "no-store", Pragma: "no-cache" });
@@ -197,10 +213,10 @@ const refreshAccessToken = async (req, res, next) => {
       success: true,
       accessToken: newAtkn,
     });
-  } catch (error) {
+  } catch (error:any) {
     if (error?.name === "JsonWebTokenError") {
       next(
-        new AuthorizationError(error, undefined, "You are unauthenticated", {
+        new AuthorizationError(error, 401, {
           realm: "Obtain new Access Token",
           error_description: "token error",
         })

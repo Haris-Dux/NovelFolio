@@ -7,7 +7,7 @@ import cors from "cors";
 import dbConnection from "./src/dbConn/index";
 import corsOptions from "./src/config/cors/cors";
 import { LostErrorHandler,AppErrorHandler } from "./src/config/exceptionHandlers/handler";
-import UserModel from "./src/models/User";
+import router from "./src/routes/index.routes";
 
 
 //   INITIALIZE EXPRESS APPLICATION
@@ -23,7 +23,7 @@ app.options("*", cors(corsOptions));
 
 
 // App modular routes
-// app.use("/api", routes);
+app.use("/api", router);
 
 //APPLICATION ERROR HANDLING 
 app.use(LostErrorHandler); // 404 error handler middleware

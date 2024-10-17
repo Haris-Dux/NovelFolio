@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const index_1 = __importDefault(require("./src/dbConn/index"));
 const cors_2 = __importDefault(require("./src/config/cors/cors"));
 const handler_1 = require("./src/config/exceptionHandlers/handler");
+const index_routes_1 = __importDefault(require("./src/routes/index.routes"));
 //   INITIALIZE EXPRESS APPLICATION
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -19,7 +20,7 @@ app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)(cors_2.default));
 app.options("*", (0, cors_1.default)(cors_2.default));
 // App modular routes
-// app.use("/api", routes);
+app.use("/api", index_routes_1.default);
 //APPLICATION ERROR HANDLING 
 app.use(handler_1.LostErrorHandler); // 404 error handler middleware
 app.use(handler_1.AppErrorHandler); // General app error handler

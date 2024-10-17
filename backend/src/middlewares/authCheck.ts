@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction  } from "express";
 import AuthorizationError from "../config/errors/AuthorizationError";
 
-interface AuthenticatedRequest  extends Request {
+export interface AuthenticatedRequest  extends Request {
   userId:string;
   token:string
 };
@@ -21,7 +21,6 @@ export const requireAuthentication = async (req: Request , res: Response, next: 
       throw new AuthorizationError(
         "Authentication Error",
         401,
-        "You are unauthenticated!",
         {
           error: "invalid_access_token",
           error_description: "unknown authentication scheme",
@@ -43,14 +42,13 @@ export const requireAuthentication = async (req: Request , res: Response, next: 
 
     const expParams = {
       error: "expired_access_token",
-      error_description: "access token is expired",
+      error_description: "Access token is expired",
     };
     if (err.name === "TokenExpiredError")
       return next(
         new AuthorizationError(
           "Authentication Error",
           401,
-          "Token lifetime exceeded!",
           expParams
         )
       );

@@ -1,16 +1,18 @@
-import CustomError from "../config/errors/CustomError";
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 
-interface IUser extends Document {
+export interface IUser extends Document {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   refreshToken: string;
+
+  generateAcessToken: () => string;
+  generateRefreshToken: () => Promise<string>;
 }
 
 
@@ -50,25 +52,7 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
-//ATTACH CUSTOM STATIC METHODS  
-UserSchema.statics.findByCredentials = async (email, password) => {
-  const user = await UserModel.findOne({ email });
-  if (!user)
-    throw new CustomError(
-      "Wrong credentials!",
-      400,
-    );
-  const passwdMatch = await bcrypt.compare(password, user.password);
-  if (!passwdMatch)
-    throw new CustomError(
-      "Wrong credentials!",
-      400,
-    );
-  return user;
-};
-
-
-UserSchema.methods.generateAcessToken = function () {
+UserSchema.methods.generateAcessToken = function () : string {
   const user = this;
 
   // Create signed access token
@@ -87,7 +71,7 @@ UserSchema.methods.generateAcessToken = function () {
   return accessToken;
 };
 
-UserSchema.methods.generateRefreshToken = async function () {
+UserSchema.methods.generateRefreshToken = async function ():Promise<string> {
   const user = this;
 
   // Create signed refresh token
@@ -114,6 +98,6 @@ UserSchema.methods.generateRefreshToken = async function () {
   return refreshToken;
 };
 
-const UserModel = mongoose.model("User", UserSchema);
+const UserModel:Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 
 export default UserModel;
