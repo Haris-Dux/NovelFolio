@@ -36,7 +36,6 @@ const requireAuthentication = (req, res, next) => __awaiter(void 0, void 0, void
     }
     catch (err) {
         // Authentication didn't go well
-        console.log(err);
         const expParams = {
             error: "expired_access_token",
             error_description: "Access token is expired",

@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchAuthUserProfile = exports.fetchUserProfile = void 0;
+exports.updateUserInformation = exports.fetchAuthUserProfile = exports.fetchUserProfile = void 0;
+const CustomError_1 = __importDefault(require("../../config/errors/CustomError"));
 const common_1 = require("../../middlewares/common");
 const User_1 = __importDefault(require("../../models/User"));
 //FETCH USER PROFILE BY ID
@@ -48,3 +49,35 @@ const fetchAuthUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 
     }
 });
 exports.fetchAuthUserProfile = fetchAuthUserProfile;
+//UPDATE USER
+const updateUserInformation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { firstName, lastName, email } = req.body;
+        const userId = req.userId;
+        yield (0, common_1.verifyrequiredparams)(req, ["userId"]);
+        let updateQuery = {};
+        if (firstName) {
+            updateQuery = Object.assign(Object.assign({}, updateQuery), { firstName });
+        }
+        if (lastName) {
+            updateQuery = Object.assign(Object.assign({}, updateQuery), { lastName });
+        }
+        if (email) {
+            const emailtocheck = email.toLowerCase();
+            const isEmailExist = yield User_1.default.findOne({ email: emailtocheck });
+            if (isEmailExist)
+                throw new CustomError_1.default("Email already exists", 409);
+            else {
+                updateQuery = Object.assign(Object.assign({}, updateQuery), { email });
+            }
+        }
+        if (Object.keys(updateQuery).length === 0)
+            throw new CustomError_1.default("No fields to update", 400);
+        const updatedUser = yield User_1.default.findByIdAndUpdate(userId, updateQuery, { new: true });
+        res.status(200).send({ message: "Update Successfull", updatedUser });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.updateUserInformation = updateUserInformation;

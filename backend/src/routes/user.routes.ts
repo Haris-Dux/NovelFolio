@@ -10,6 +10,7 @@ import { requireAuthentication } from "../middlewares/authCheck";
 import {
   fetchAuthUserProfile,
   fetchUserProfile,
+  updateUserInformation,
 } from "../controllers/user/user.controller";
 
 const userRouter = express.Router();
@@ -18,7 +19,8 @@ const userRouter = express.Router();
 userRouter
   .post("/login", login)
   .post("/signup", signup)
-  .post("/logout", logout)
+  .post("/logout", requireAuthentication,logout)
+  .patch("/updateUserInformation", requireAuthentication,updateUserInformation)
   .post("/master-logout", requireAuthentication, logoutAllDevices)
   .post("/reauth", refreshAccessToken)
   .get("/me", requireAuthentication, fetchAuthUserProfile)

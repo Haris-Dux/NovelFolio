@@ -9,6 +9,7 @@ const env_NODE_ENV:string = "development";
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(authMiddleware),
   devTools: env_NODE_ENV !== "production",
+  
 });
 
 

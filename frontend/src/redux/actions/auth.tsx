@@ -76,7 +76,7 @@ export function refreshAccessToken() {
 }
 
 export function logout() {
-  return async function (dispatch:AppDispatch) {
+  return async function (dispatch: AppDispatch) {
     try {
       await API.logout();
       dispatch(authUserLogout());

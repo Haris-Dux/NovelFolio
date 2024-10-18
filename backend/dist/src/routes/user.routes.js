@@ -12,7 +12,8 @@ const userRouter = express_1.default.Router();
 userRouter
     .post("/login", auth_controller_1.login)
     .post("/signup", auth_controller_1.signup)
-    .post("/logout", auth_controller_1.logout)
+    .post("/logout", authCheck_1.requireAuthentication, auth_controller_1.logout)
+    .patch("/updateUserInformation", authCheck_1.requireAuthentication, user_controller_1.updateUserInformation)
     .post("/master-logout", authCheck_1.requireAuthentication, auth_controller_1.logoutAllDevices)
     .post("/reauth", auth_controller_1.refreshAccessToken)
     .get("/me", authCheck_1.requireAuthentication, user_controller_1.fetchAuthUserProfile)

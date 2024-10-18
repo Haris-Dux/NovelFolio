@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface User {
   id?: string; 
-  name?: string;
+  firstName?: string;
+  lastName?: string;  
   email?: string;
 }
 
@@ -13,6 +14,7 @@ interface AuthState {
   token: string | null;
   user_loading: boolean; 
   token_loading: boolean; 
+  update_loading: boolean
 }
 
 const initialState:AuthState = {
@@ -20,6 +22,7 @@ const initialState:AuthState = {
   token: null,
   user_loading: false, // `user` info is being processed [e.g Login]
   token_loading: false, // when `token` info is being processed [e.g refreshing auth]
+  update_loading:false
 };
 
 const authSlice = createSlice({
@@ -47,6 +50,13 @@ const authSlice = createSlice({
         user_loading: Boolean(payload?.loading),
       };
     },
+    updateUserLoading(state, action) {
+      const { payload } = action;
+      return {
+        ...state,
+        update_loading: Boolean(payload?.loading),
+      };
+    },
     authUserLogout() {
       return {
         ...initialState,
@@ -69,6 +79,7 @@ export const {
   authUserLoading,
   authTokenLoading,
   authUserLogout,
+  updateUserLoading
 } = authSlice.actions;
 
 // Export reducer as default export

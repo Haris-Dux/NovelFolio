@@ -26,10 +26,8 @@ export const requireAuthentication = async (req: Request , res: Response, next: 
           error_description: "unknown authentication scheme",
         }
       );
-
     const accessTokenParts = authHeader.split(" ");
     const aTkn = accessTokenParts[1];
-
     const decoded = jwt.verify(aTkn, ACCESS_TOKEN_SECRET) as TokenData;
 
     // Attach authenticated user and Access Token to request object
@@ -38,8 +36,6 @@ export const requireAuthentication = async (req: Request , res: Response, next: 
     next();
   } catch (err:any) {
     // Authentication didn't go well
-    console.log(err);
-
     const expParams = {
       error: "expired_access_token",
       error_description: "Access token is expired",
@@ -52,7 +48,6 @@ export const requireAuthentication = async (req: Request , res: Response, next: 
           expParams
         )
       );
-
     next(err);
   }
 };
