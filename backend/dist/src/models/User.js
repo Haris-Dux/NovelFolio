@@ -25,7 +25,7 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    refreshToken: { required: true, type: String },
+    refreshToken: { required: false, type: String },
 });
 //SET SCHEMA OPTION
 UserSchema.set("toJSON", {

@@ -22,6 +22,6 @@ userRouter
   .post("/master-logout", requireAuthentication, logoutAllDevices)
   .post("/reauth", refreshAccessToken)
   .get("/me", requireAuthentication, fetchAuthUserProfile)
-  .get("/fetchUserProfile", requireAuthentication,fetchUserProfile);
+  .get( "/:id", requireAuthentication,fetchUserProfile);
 
 export default userRouter;

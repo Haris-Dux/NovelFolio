@@ -112,7 +112,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     // Authenticated user ID attached on `req` by authentication middleware
     const userId = (req as AuthenticatedRequest).userId;
     const user:any  = await UserModel.findById(userId);
-     user.refreshToken = ""
+     user.refreshToken = undefined
     await user.save();
 
     // Set cookie expiry option to past date so it is destroyed
@@ -181,17 +181,14 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
         }
       );
     }
-
     const decodedRefreshTkn = jwt.verify(refreshToken, REFRESH_TOKEN.secret );
-
     const rTknHash = crypto
       .createHmac("sha256", REFRESH_TOKEN.secret)
       .update(refreshToken)
       .digest("hex");
-
     const userWithRefreshTkn = await UserModel.findOne({
       _id: (decodedRefreshTkn as JwtPayload )._id,
-      "tokens.token": rTknHash,
+      "refreshToken": rTknHash,
     });
     if (!userWithRefreshTkn)
       throw new AuthorizationError(
@@ -214,7 +211,8 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
       accessToken: newAtkn,
     });
   } catch (error:any) {
-    if (error?.name === "JsonWebTokenError") {
+    if (error?.name === "JsonWebTokenError"  || error.name === "TokenExpiredError" ) {
+      res.clearCookie(REFRESH_TOKEN.cookie.name),
       next(
         new AuthorizationError(error, 401, {
           realm: "Obtain new Access Token",

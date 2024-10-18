@@ -16,5 +16,5 @@ userRouter
     .post("/master-logout", authCheck_1.requireAuthentication, auth_controller_1.logoutAllDevices)
     .post("/reauth", auth_controller_1.refreshAccessToken)
     .get("/me", authCheck_1.requireAuthentication, user_controller_1.fetchAuthUserProfile)
-    .get("/fetchUserProfile", authCheck_1.requireAuthentication, user_controller_1.fetchUserProfile);
+    .get("/:id", authCheck_1.requireAuthentication, user_controller_1.fetchUserProfile);
 exports.default = userRouter;

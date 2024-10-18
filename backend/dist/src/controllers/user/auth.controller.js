@@ -100,7 +100,7 @@ const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         // Authenticated user ID attached on `req` by authentication middleware
         const userId = req.userId;
         const user = yield User_1.default.findById(userId);
-        user.refreshToken = "";
+        user.refreshToken = undefined;
         yield user.save();
         // Set cookie expiry option to past date so it is destroyed
         const expireCookieOptions = Object.assign({}, REFRESH_TOKEN.cookie.options, {
@@ -161,7 +161,7 @@ const refreshAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0,
             .digest("hex");
         const userWithRefreshTkn = yield User_1.default.findOne({
             _id: decodedRefreshTkn._id,
-            "tokens.token": rTknHash,
+            "refreshToken": rTknHash,
         });
         if (!userWithRefreshTkn)
             throw new AuthorizationError_1.default("Authentication Error", 401, {
@@ -178,11 +178,12 @@ const refreshAccessToken = (req, res, next) => __awaiter(void 0, void 0, void 0,
         });
     }
     catch (error) {
-        if ((error === null || error === void 0 ? void 0 : error.name) === "JsonWebTokenError") {
-            next(new AuthorizationError_1.default(error, 401, {
-                realm: "Obtain new Access Token",
-                error_description: "token error",
-            }));
+        if ((error === null || error === void 0 ? void 0 : error.name) === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+            res.clearCookie(REFRESH_TOKEN.cookie.name),
+                next(new AuthorizationError_1.default(error, 401, {
+                    realm: "Obtain new Access Token",
+                    error_description: "token error",
+                }));
             return;
         }
         next(error);

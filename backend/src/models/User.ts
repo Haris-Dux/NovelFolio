@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema<IUser>({
     required: true,
   },
   refreshToken: 
-   { required: true, type: String },
+   { required: false, type: String },
 });
 
 //SET SCHEMA OPTION
@@ -73,7 +73,6 @@ UserSchema.methods.generateAcessToken = function () : string {
 
 UserSchema.methods.generateRefreshToken = async function ():Promise<string> {
   const user = this;
-
   // Create signed refresh token
   const refreshToken = jwt.sign(
     {
