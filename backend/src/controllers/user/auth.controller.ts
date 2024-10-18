@@ -105,7 +105,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-
 //LOGOUT USER
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {

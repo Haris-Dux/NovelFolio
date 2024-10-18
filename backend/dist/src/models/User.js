@@ -31,8 +31,8 @@ const UserSchema = new mongoose_1.default.Schema({
 UserSchema.set("toJSON", {
     virtuals: true,
     transform: function (doc, ret, options) {
-        const { firstName, lastName, email } = ret;
-        return { firstName, lastName, email }; // return fields we need
+        const { firstName, lastName, email, id: _id } = ret;
+        return { firstName, lastName, email, id: _id }; // return fields we need
     },
 });
 //ATTACH MIDDLEWARE

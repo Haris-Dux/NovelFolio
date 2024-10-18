@@ -33,9 +33,9 @@ const UserSchema = new mongoose.Schema<IUser>({
 UserSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret, options) {
-    const { firstName, lastName, email } = ret;
+    const { firstName, lastName, email,id:_id } = ret;
 
-    return { firstName, lastName, email }; // return fields we need
+    return { firstName, lastName, email, id:_id}; // return fields we need
   },
 });
 
