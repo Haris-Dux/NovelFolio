@@ -17,13 +17,13 @@ const userRouter = express.Router();
 
 //User Routes
 userRouter
-  .post("/login", login)
-  .post("/signup", signup)
-  .post("/logout", requireAuthentication,logout)
-  .patch("/updateUserInformation", requireAuthentication,updateUserInformation)
-  .post("/master-logout", requireAuthentication, logoutAllDevices)
-  .post("/reauth", refreshAccessToken)
-  .get("/me", requireAuthentication, fetchAuthUserProfile)
-  .get( "/:id", requireAuthentication,fetchUserProfile);
+  .post("/users/login", login)
+  .post("/users/signup", signup)
+  .post("/users/logout", requireAuthentication,logout)
+  .patch("/users/updateUserInformation", requireAuthentication,updateUserInformation)
+  .post("/users/master-logout", requireAuthentication, logoutAllDevices)
+  .post("/users/reauth", refreshAccessToken)
+  .get("/users/me", requireAuthentication, fetchAuthUserProfile)
+  .get( "/users/:id", requireAuthentication,fetchUserProfile);
 
 export default userRouter;

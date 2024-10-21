@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar/Navbar";
 import { AuthenticationContext } from "../context/authenticationContext";
 
 function AppLayout() {
-  const hasToken = useSelector((state) => state?.auth?.token);
+  const hasToken = useSelector((state:any) => state?.auth?.token);
   const authStorage = useLocalStorage((storage) => storage.authStorage);
 
   const cachedUserIsAuthenticated = useMemo(() => {

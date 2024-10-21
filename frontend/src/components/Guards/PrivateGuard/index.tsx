@@ -8,14 +8,14 @@ import {
   addAuthUser,
 } from "../../../redux/features/auth/authSlice";
 import { AuthenticationContext } from "../../../context/authenticationContext";
-import { logout } from "../../../redux/actions";
 import { authStorage } from "../../../utils/browserStorage";
+import { RootState } from "../../../redux/store";
 
 let cmpntInitialized = false;
 let componentIsMounted = false;
 
 const PrivateRouteGuard = () => {
-  const token = useSelector((state) => state?.auth?.token);
+  const token = useSelector((state:RootState) => state?.auth?.token);
   const { userIsAuthenticated } = useContext(AuthenticationContext);
 
   const [displayPage, setDisplayPage] = useState(false);

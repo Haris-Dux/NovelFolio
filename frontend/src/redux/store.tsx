@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
+import reviewReducer from "./features/review/reviewSlice";
 import authMiddleware from "./middlewares/authMiddleware";
 const env_NODE_ENV:string = "development";
  const store = configureStore({
   reducer: {
     auth: authReducer,
+    review:reviewReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(authMiddleware),

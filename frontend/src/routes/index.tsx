@@ -14,14 +14,23 @@ const router = createBrowserRouter([
     path: "",
     element: <AppLayout />,
     children: [
+      // Home is accessible to both logged-in and logged-out users
       {
         path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/login",
         element: <PublicRouteGuard />,
         children: [
-          { path: "", element: <Home /> },
-          { path: "/login", element: <Login /> },
-          { path: "/signup", element: <Signup /> },
-        
+          { path: "", element: <Login /> },
+        ],
+      },
+      {
+        path: "/signup",
+        element: <PublicRouteGuard />,
+        children: [
+          { path: "", element: <Signup /> },
         ],
       },
       {
@@ -39,5 +48,7 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+
 
 export { router };

@@ -58,6 +58,7 @@ interface File {
 export const uploadImageToFirebase = async (file: File | null, folder: string) => {
     try {
         if(!file) throw new CustomError("File Missing",404)
+          console.log('file',file);
         const storageRef = ref(storage, `${folder}/${file.originalname}`);
         const metadata = {
             contentType: file.mimetype,

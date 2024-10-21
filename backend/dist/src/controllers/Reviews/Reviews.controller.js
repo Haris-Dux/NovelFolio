@@ -16,26 +16,28 @@ exports.viewALLReviews = exports.viewUserReviews = exports.deleteBookReview = ex
 const Reviews_1 = __importDefault(require("../../models/Reviews"));
 const CustomError_1 = __importDefault(require("../../config/errors/CustomError"));
 const common_1 = require("../../middlewares/common");
+const mongoose_1 = __importDefault(require("mongoose"));
 // Create a new book review
 const createBookReview = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, author, reviewText, rating, userId } = req.body;
-    yield (0, common_1.verifyrequiredparams)(req.body, [
-        "title",
-        "author",
-        "reviewText",
-        "rating",
-        "userId",
-    ]);
-    const file = req.file;
-    if (!file)
-        throw new CustomError_1.default("Please provide a file", 400);
-    const result = yield (0, common_1.uploadImageToFirebase)(file, "Novel Folio");
-    const imageData = {
-        downloadURL: result.downloadURL,
-        name: result.name,
-        type: result.type,
-    };
     try {
+        const { title, author, reviewText, rating } = req.body;
+        const userId = req.userId;
+        yield (0, common_1.verifyrequiredparams)(req.body, [
+            "title",
+            "author",
+            "reviewText",
+            "rating",
+        ]);
+        console.log("title", title);
+        const file = req.file;
+        if (!file)
+            throw new CustomError_1.default("Please provide a file", 400);
+        const result = yield (0, common_1.uploadImageToFirebase)(file, "Novel Folio");
+        const imageData = {
+            downloadURL: result.downloadURL,
+            name: result.name,
+            type: result.type,
+        };
         const newReview = new Reviews_1.default({
             title,
             author,
@@ -56,12 +58,13 @@ const createBookReview = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 exports.createBookReview = createBookReview;
 // Edit a book review
 const editBookReview = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, author, reviewText, rating, reviewId, userId } = req.body;
-    // Validate review ID
-    if (!reviewId) {
-        throw new CustomError_1.default("No review ID provided", 400);
-    }
     try {
+        const { title, author, reviewText, rating, reviewId } = req.body;
+        const userId = req.userId;
+        // Validate review ID
+        if (!reviewId) {
+            throw new CustomError_1.default("No review ID provided", 400);
+        }
         // Find the review by ID
         const review = yield Reviews_1.default.findById(reviewId);
         if ((review === null || review === void 0 ? void 0 : review.user_Id.toString()) !== userId) {
@@ -102,12 +105,12 @@ const editBookReview = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.editBookReview = editBookReview;
 // Delete a book review
 const deleteBookReview = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { reviewId } = req.body;
-    // Validate review ID
-    if (!reviewId) {
-        throw new CustomError_1.default("No review ID provided", 400);
-    }
     try {
+        const { reviewId } = req.body;
+        // Validate review ID
+        if (!reviewId) {
+            throw new CustomError_1.default("No review ID provided", 400);
+        }
         yield Reviews_1.default.findByIdAndDelete(reviewId);
         return res.status(200).send({ message: "Review deleted successfully" });
     }
@@ -120,17 +123,18 @@ exports.deleteBookReview = deleteBookReview;
 const viewUserReviews = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 15;
+        const limit = 8;
         let search = req.query.search || "";
+        const userId = new mongoose_1.default.Types.ObjectId(req.userId);
         let query = {
-            name: { $regex: search, $options: "i" },
-            user_Id: req.userId,
+            title: { $regex: search, $options: "i" },
+            user_Id: userId,
         };
         const reviewData = yield Reviews_1.default.find(query)
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ createdAt: -1 });
-        if (reviewData.length < 0) {
+        if (reviewData.length <= 0) {
             throw new CustomError_1.default("No reviews found for this user", 404);
         }
         const total = yield Reviews_1.default.countDocuments(query);
@@ -150,16 +154,16 @@ exports.viewUserReviews = viewUserReviews;
 const viewALLReviews = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 15;
+        const limit = 8;
         let search = req.query.search || "";
         let query = {
-            name: { $regex: search, $options: "i" },
+            title: { $regex: search, $options: "i" },
         };
         const reviewData = yield Reviews_1.default.find(query)
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ createdAt: -1 });
-        if (reviewData.length < 0) {
+        if (reviewData.length <= 0) {
             throw new CustomError_1.default("No reviews found", 404);
         }
         const total = yield Reviews_1.default.countDocuments(query);

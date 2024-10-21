@@ -7,6 +7,7 @@ import {
   verifyrequiredparams,
 } from "../../middlewares/common";
 import { AuthenticatedRequest } from "../../middlewares/authCheck";
+import mongoose from "mongoose";
 
 // Create a new book review
 export const createBookReview = async (
@@ -14,23 +15,25 @@ export const createBookReview = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { title, author, reviewText, rating, userId } = req.body;
-  await verifyrequiredparams(req.body, [
-    "title",
-    "author",
-    "reviewText",
-    "rating",
-    "userId",
-  ]);
-  const file = req.file;
-  if (!file) throw new CustomError("Please provide a file", 400);
-  const result = await uploadImageToFirebase(file, "Novel Folio");
-  const imageData = {
-    downloadURL: result.downloadURL,
-    name: result.name,
-    type: result.type,
-  };
   try {
+    const { title, author, reviewText, rating } = req.body;
+    const userId = (req as AuthenticatedRequest).userId;
+    await verifyrequiredparams(req.body, [
+      "title",
+      "author",
+      "reviewText",
+      "rating",
+    ]);
+    console.log("title", title);
+    const file = req.file;
+    if (!file) throw new CustomError("Please provide a file", 400);
+    const result = await uploadImageToFirebase(file, "Novel Folio");
+    const imageData = {
+      downloadURL: result.downloadURL,
+      name: result.name,
+      type: result.type,
+    };
+
     const newReview = new BookReview({
       title,
       author,
@@ -55,12 +58,14 @@ export const editBookReview = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { title, author, reviewText, rating, reviewId, userId } = req.body;
+  try {
+  const { title, author, reviewText, rating, reviewId } = req.body;
+  const userId = (req as AuthenticatedRequest).userId;
   // Validate review ID
   if (!reviewId) {
     throw new CustomError("No review ID provided", 400);
   }
-  try {
+ 
     // Find the review by ID
     const review: any = await BookReview.findById(reviewId);
 
@@ -106,12 +111,13 @@ export const deleteBookReview = async (
   res: Response,
   next: NextFunction
 ) => {
+  try {
   const { reviewId }: IBookReview = req.body;
   // Validate review ID
   if (!reviewId) {
     throw new CustomError("No review ID provided", 400);
   }
-  try {
+  
     await BookReview.findByIdAndDelete(reviewId);
     return res.status(200).send({ message: "Review deleted successfully" });
   } catch (error: any) {
@@ -127,23 +133,21 @@ export const viewUserReviews = async (
 ) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = 15;
+    const limit = 8;
     let search = req.query.search || "";
-
+    const userId = new mongoose.Types.ObjectId((req as AuthenticatedRequest).userId);
     let query = {
-      name: { $regex: search, $options: "i" },
-      user_Id: (req as AuthenticatedRequest).userId,
+      title: { $regex: search, $options: "i" },
+      user_Id: userId,
     };
-
     const reviewData = await BookReview.find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    if (reviewData.length < 0) {
+    if (reviewData.length <= 0) {
       throw new CustomError("No reviews found for this user", 404);
     }
-
     const total = await BookReview.countDocuments(query);
 
     const response = {
@@ -165,19 +169,18 @@ export const viewALLReviews = async (
 ) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = 15;
+    const limit = 8;
     let search = req.query.search || "";
 
     let query = {
-      name: { $regex: search, $options: "i" },
+      title: { $regex: search, $options: "i" },
     };
-
     const reviewData = await BookReview.find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    if (reviewData.length < 0) {
+    if (reviewData.length <= 0) {
       throw new CustomError("No reviews found", 404);
     }
 

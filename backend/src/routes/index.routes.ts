@@ -4,7 +4,7 @@ import reviewRouter from "./review.routes";
 const router = express.Router();
 
 
-router.use("/users", userRouter);
-router.use("/reviews", reviewRouter);
+router.use(userRouter);
+router.use(reviewRouter);
 
 export default router;

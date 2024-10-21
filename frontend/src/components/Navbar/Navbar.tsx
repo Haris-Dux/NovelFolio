@@ -5,19 +5,40 @@ import { HiOutlineUser } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { logout, updateUserProfile } from "../../redux/actions";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
-import {BiX } from "react-icons/bi";
+import { BiX } from "react-icons/bi";
+import { MdOutlineNoteAdd } from "react-icons/md";
+import ReviewModal from "../ReviewModal/ReviewModal";
+import { AuthenticationContext } from "../../context/authenticationContext";
+import { getALLReviews } from "../../redux/actions/review";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [reviewModal, setReviewModal] = useState<boolean>(false);
   const user = useSelector((state: RootState) => state?.auth?.user);
+  const { userIsAuthenticated } = useContext(AuthenticationContext);
+  const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+
+   useEffect(() => {
+    if (searchQuery) {
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+
+      const newTimeout = setTimeout(() => {
+        dispatch(getALLReviews({search:searchQuery}))
+      }, 1000);
+
+      setDebounceTimeout(newTimeout);
+    }
+  }, [searchQuery, dispatch]); 
+
   const update_loading = useSelector(
     (state: RootState) => state?.auth?.update_loading
   );
-  const dispatch = useDispatch<AppDispatch>();
 
   const handleLogOut = () => {
     dispatch(logout());
@@ -30,7 +51,15 @@ const Navbar = () => {
   const closeModal = () => {
     setIsOpen(false);
   };
-  
+
+  const openReviewModal = () => {
+    setReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setReviewModal(false);
+  };
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -48,16 +77,19 @@ const Navbar = () => {
       email: Yup.string().email("Invalid email address").required("Required"),
     }),
     onSubmit: (values) => {
-      const updatedValues = Object.keys(values).reduce((acc: Partial<typeof values>, key: string) => {
-        const typedKey = key as keyof typeof values;
-        
-        if (values[typedKey] !== formik.initialValues[typedKey]) {
-          acc[typedKey] = values[typedKey];
-        }
-        
-        return acc;
-      }, {});
-    
+      const updatedValues = Object.keys(values).reduce(
+        (acc: Partial<typeof values>, key: string) => {
+          const typedKey = key as keyof typeof values;
+
+          if (values[typedKey] !== formik.initialValues[typedKey]) {
+            acc[typedKey] = values[typedKey];
+          }
+
+          return acc;
+        },
+        {}
+      );
+
       function alterFormToAPIResult(
         error: string | null,
         success: string | null
@@ -82,25 +114,34 @@ const Navbar = () => {
           </Link>
 
           {/* search input */}
-          <div className="relative sm:w-72 w-40 space-x-2">
-            <IoSearchOutline className="absolute inline-block left-3 inset-y-2" />
+          {!userIsAuthenticated && (
+            <div className="relative sm:w-72 w-40 space-x-2">
+              <IoSearchOutline className="absolute inline-block left-3 inset-y-2" />
 
-            <input
-              type="text"
-              placeholder="Search here"
-              className="bg-[#EAEAEA] w-full py-1 md:px-8 px-6 rounded-md focus:outline-none"
-            />
-          </div>
+              <input
+                type="text"
+                placeholder="Search here"
+                className="bg-[#EAEAEA] w-full py-1 md:px-8 px-6 rounded-md focus:outline-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+              />
+            </div>
+          )}
         </div>
 
         {/* rigth side */}
         <div className="relative flex items-center md:space-x-3 space-x-2">
+         {userIsAuthenticated && <MdOutlineNoteAdd
+            onClick={openReviewModal}
+            className="size-6 cursor-pointer"
+          />}
+
           <div>
             <div className="relative group">
               <Link to="/login">
                 {" "}
                 <HiOutlineUser className="size-6" />
-                <div className="absolute right-0 hidden group-hover:block">
+               {userIsAuthenticated && <div className="absolute bg-white right-0 hidden group-hover:block">
                   <div className="container block mx-auto mt-4 max-w-md p-4 border rounded-lg shadow-lg">
                     <h2 className="text-center text-2xl font-semibold mb-4">
                       Your Profile
@@ -128,7 +169,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Button */}
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex bg-white items-center justify-center gap-2">
                       <button
                         onClick={handleLogOut}
                         className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
@@ -143,18 +184,21 @@ const Navbar = () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div>}
               </Link>
             </div>
           </div>
         </div>
       </nav>
-      {/* modal */}
-
+      {/* Update user modal */}
       {isOpen && (
-        <div className="flex justify-center items-center ">
+        <div className="fixed inset-0 z-50 flex justify-center items-center ">
           <div className="relative w-full max-w-sm mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-2">
-            <BiX size={32} onClick={closeModal} className="text-red-500 absolute right-1 top-1 cursor-pointer" />
+            <BiX
+              size={32}
+              onClick={closeModal}
+              className="text-red-500 absolute right-1 top-1 cursor-pointer"
+            />
             <form onSubmit={formik.handleSubmit}>
               {/* First Name */}
               <div className="mb-2">
@@ -234,6 +278,9 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* create review modal */}
+      {reviewModal && <ReviewModal closeReviewModal={closeReviewModal} />}
     </header>
   );
 };

@@ -26,15 +26,15 @@ export interface ResponseData {
 
 //Login API endpoint
 export const login = (data:AuthData) =>
-  http.post("/login", data, { withCredentials: true });
+  http.post("/users/login", data, { withCredentials: true });
 
 //Signup API endpoint
 export const signup = (data:AuthData) =>
-  http.post("/signup", data, { withCredentials: true });
+  http.post("/users/signup", data, { withCredentials: true });
 
 // Refresh Token API endpoint
 export const refreshAccessToken = ():Promise<ResponseData> =>
-  http("/reauth", {
+  http("/users/reauth", {
     method: "post",
     withCredentials: true,
   });
@@ -42,7 +42,7 @@ export const refreshAccessToken = ():Promise<ResponseData> =>
 
 //Logout API endpoint
 export const logout = ():Promise<ResponseData> =>
-  http.post("/logout", null, {
+  http.post("/users/logout", null, {
     withCredentials: true,
     requireAuthHeader: true,
   } as CustomAxiosRequestConfig);

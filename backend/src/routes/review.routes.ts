@@ -8,11 +8,11 @@ const reviewRouter = express.Router();
 
 //User Routes
 reviewRouter
-  .post("/createBookReview",requireAuthentication,upload.single("filename"), createBookReview)
-  .patch("/editBookReview",requireAuthentication,upload.single("filename"), editBookReview)
-  .delete("/deleteBookReview",requireAuthentication, deleteBookReview)
-  .get("/viewUserReviews",requireAuthentication, viewUserReviews)
-  .get("/viewALLReviews",requireAuthentication, viewALLReviews)
+  .post("/reviews/createBookReview",requireAuthentication,upload.single("image"), createBookReview)
+  .patch("/reviews/editBookReview",requireAuthentication,upload.single("image"), editBookReview)
+  .post("/reviews/deleteBookReview",requireAuthentication, deleteBookReview)
+  .get("/reviews/viewUserReviews",requireAuthentication, viewUserReviews)
+  .get("/reviews/viewALLReviews", viewALLReviews)
 
  
 

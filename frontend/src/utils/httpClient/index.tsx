@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASEURL = "http://localhost:4000/api/users";
+const BASEURL = "http://localhost:4000/api";
 const TIMEOUTMSG = "Request timed out. Please try again.";
 
 const config = {
