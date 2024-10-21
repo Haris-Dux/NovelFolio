@@ -9,8 +9,7 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
-import { BiCloset, BiCross, BiX } from "react-icons/bi";
-import { FaCross } from "react-icons/fa";
+import {BiX } from "react-icons/bi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
