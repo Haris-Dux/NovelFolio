@@ -24,17 +24,17 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
 
-   useEffect(() => {
+  useEffect(() => {
     if (searchQuery) {
       if (debounceTimeout) clearTimeout(debounceTimeout);
 
       const newTimeout = setTimeout(() => {
-        dispatch(getALLReviews({search:searchQuery}))
+        dispatch(getALLReviews({ search: searchQuery }));
       }, 1000);
 
       setDebounceTimeout(newTimeout);
     }
-  }, [searchQuery, dispatch]); 
+  }, [searchQuery, dispatch]);
 
   const update_loading = useSelector(
     (state: RootState) => state?.auth?.update_loading
@@ -110,7 +110,12 @@ const Navbar = () => {
         {/* left side */}
         <div className="flex items-center md:gap-16 gap-4">
           <Link to="/">
-            <HiMiniBars3CenterLeft className="size-6" />
+            <img
+              src={
+                "https://firebasestorage.googleapis.com/v0/b/it-expert-d4328.appspot.com/o/Novel%20Folio%2Fbook-and-pen-svgrepo-com%20(1).svg?alt=media&token=a8c7d4cd-d040-4434-af13-6dd1577e12ea"
+              }
+              className="size-6"
+            />
           </Link>
 
           {/* search input */}
@@ -131,60 +136,64 @@ const Navbar = () => {
 
         {/* rigth side */}
         <div className="relative flex items-center md:space-x-3 space-x-2">
-         {userIsAuthenticated && <MdOutlineNoteAdd
-            onClick={openReviewModal}
-            className="size-6 cursor-pointer"
-          />}
+          {userIsAuthenticated && (
+            <MdOutlineNoteAdd
+              onClick={openReviewModal}
+              className="size-6 cursor-pointer"
+            />
+          )}
 
           <div>
             <div className="relative group">
               <Link to="/login">
                 {" "}
                 <HiOutlineUser className="size-6" />
-               {userIsAuthenticated && <div className="absolute bg-white right-0 hidden group-hover:block">
-                  <div className="container block mx-auto mt-4 max-w-md p-4 border rounded-lg shadow-lg">
-                    <h2 className="text-center text-2xl font-semibold mb-4">
-                      Your Profile
-                    </h2>
+                {userIsAuthenticated && (
+                  <div className="absolute bg-white right-0 hidden group-hover:block">
+                    <div className="container block mx-auto mt-4 max-w-md p-4 border rounded-lg shadow-lg">
+                      <h2 className="text-center text-2xl font-semibold mb-4">
+                        Your Profile
+                      </h2>
 
-                    {/* Card Section */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                      <div className="mb-4">
-                        <h3 className="font-semibold">Details of user:</h3>
-                        <ul className="mt-2 space-y-2">
-                          <li>
-                            <b>First Name: </b>
-                            <span>{user?.firstName}</span>
-                          </li>
-                          <li>
-                            <b>Last Name: </b>
-                            <span>{user?.lastName}</span>
-                          </li>
-                          <li>
-                            <b>Email: </b>
-                            <span>{user?.email}</span>
-                          </li>
-                        </ul>
+                      {/* Card Section */}
+                      <div className="bg-white p-4 rounded-lg shadow-md">
+                        <div className="mb-4">
+                          <h3 className="font-semibold">Details of user:</h3>
+                          <ul className="mt-2 space-y-2">
+                            <li>
+                              <b>First Name: </b>
+                              <span>{user?.firstName}</span>
+                            </li>
+                            <li>
+                              <b>Last Name: </b>
+                              <span>{user?.lastName}</span>
+                            </li>
+                            <li>
+                              <b>Email: </b>
+                              <span>{user?.email}</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Button */}
+                      <div className="flex bg-white items-center justify-center gap-2">
+                        <button
+                          onClick={handleLogOut}
+                          className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                        >
+                          log Out
+                        </button>
+                        <button
+                          onClick={openModal}
+                          className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                        >
+                          Edit User
+                        </button>
                       </div>
                     </div>
-
-                    {/* Button */}
-                    <div className="flex bg-white items-center justify-center gap-2">
-                      <button
-                        onClick={handleLogOut}
-                        className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                      >
-                        log Out
-                      </button>
-                      <button
-                        onClick={openModal}
-                        className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                      >
-                        Edit User
-                      </button>
-                    </div>
                   </div>
-                </div>}
+                )}
               </Link>
             </div>
           </div>
