@@ -62,7 +62,6 @@ const uploadImageToFirebase = (file, folder) => __awaiter(void 0, void 0, void 0
     try {
         if (!file)
             throw new CustomError_1.default("File Missing", 404);
-        console.log('file', file);
         const storageRef = (0, storage_1.ref)(storage, `${folder}/${file.originalname}`);
         const metadata = {
             contentType: file.mimetype,

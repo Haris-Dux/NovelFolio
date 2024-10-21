@@ -16,7 +16,6 @@ function useLocalStorage<T>(fn: (storage: typeof BrowserStorage) => T): T {
     function handleStorageChange(event: StorageEvent) {
       event.stopPropagation();
 
-      console.log("Browser storage changed!");
 
       triggerRender((prev) => prev + 1);
     }

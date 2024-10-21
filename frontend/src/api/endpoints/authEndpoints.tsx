@@ -33,7 +33,7 @@ export const signup = (data:AuthData) =>
   http.post("/users/signup", data, { withCredentials: true });
 
 // Refresh Token API endpoint
-export const refreshAccessToken = ():Promise<ResponseData> =>
+export const refreshAccessToken = () =>
   http("/users/reauth", {
     method: "post",
     withCredentials: true,

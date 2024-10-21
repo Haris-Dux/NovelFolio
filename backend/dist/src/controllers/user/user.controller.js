@@ -28,7 +28,6 @@ const fetchUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });
@@ -44,7 +43,6 @@ const fetchAuthUserProfile = (req, res, next) => __awaiter(void 0, void 0, void 
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });

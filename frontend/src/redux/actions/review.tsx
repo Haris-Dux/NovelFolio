@@ -42,7 +42,6 @@ export function getALLUserReviews(data:IBookReview) {
       dispatch(addreview_loading({loading:true}))
 
       const response = await API.getUserReviews(data);
-      console.log('res',response);
       dispatch(
         addReviewData({
           reviewData: response.data.reviewData,
@@ -64,7 +63,6 @@ export function getALLUserReviews(data:IBookReview) {
 export function deleteUserReviews(data:API.deleteReviewData,callback:(success:string | null) => void) {
   return async function () {
     try {
-      console.log('data',data);
       const response = await API.deleteUserReviews(data);
     if(callback){
       callback(response?.data?.message);
@@ -82,7 +80,6 @@ export function getALLReviews(data:IBookReview) {
     try {
       dispatch(addreview_loading({loading:true}))
       const response = await API.getAllReviews(data);
-      console.log('res',response);
       dispatch(
         addReviewData({
           reviewData: response.data.reviewData,

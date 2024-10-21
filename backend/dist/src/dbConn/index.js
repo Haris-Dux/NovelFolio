@@ -10,9 +10,7 @@ mongoose_1.default.set('bufferCommands', false);
 const db = mongoose_1.default.connect(connURI);
 db.catch((err) => {
     if (err.message.code === "ETIMEDOUT") {
-        console.log(err.message.code);
         mongoose_1.default.connect(connURI);
     }
-    console.log(err.message);
 });
 exports.default = db;

@@ -20,7 +20,6 @@ function runInterceptors(store:{ getState: () => any; dispatch: (action: any) =>
       return config;
     },
     (error:AxiosError) => {
-      console.log("REQUEST interceptor error",error);
       return Promise.reject(error);
     }
   );
@@ -56,7 +55,7 @@ function runInterceptors(store:{ getState: () => any; dispatch: (action: any) =>
               throw new Error(`Max retries(${config?._retries}) reached!`);
 
             // Call API endpoint to refresh Access token
-            const { data } = await refreshAccessToken();
+            const { data }  = await refreshAccessToken();
             const newAccessToken = data?.accessToken;
 
             // Add/replace `Authorization` header to `config` of original request
@@ -76,7 +75,6 @@ function runInterceptors(store:{ getState: () => any; dispatch: (action: any) =>
            
           }
         }
-        console.log("response interceptor error",error);
         return Promise.reject(error);
       }
     );

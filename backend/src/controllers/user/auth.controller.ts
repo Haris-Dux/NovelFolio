@@ -57,7 +57,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       accessToken: aTkn,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -100,7 +99,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       accessToken: aTkn,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -129,7 +127,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
       success: true,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -158,7 +155,6 @@ export const logoutAllDevices = async (req: Request, res: Response, next: NextFu
       success: true,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

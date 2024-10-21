@@ -59,7 +59,6 @@ const signup = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });
@@ -89,7 +88,6 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });
@@ -113,7 +111,6 @@ const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });
@@ -137,7 +134,6 @@ const logoutAllDevices = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 });

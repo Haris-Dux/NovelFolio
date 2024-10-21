@@ -17,7 +17,6 @@ export function getUserProfile() {
       // Add authenticated user to redux store
       dispatch(addAuthUser({ user }));
     } catch (error) {
-      console.log(error);
     } finally {
       dispatch(authUserLoading({ loading: false }));
     }
@@ -33,7 +32,6 @@ export function updateUserProfile(
       dispatch(updateUserLoading({ loading: true }));
       const response = await API.updateUserProfile(data);
       const user = response.data?.updatedUser;
-      console.log('user',user);
       // Add authenticated user to redux store
       dispatch(addAuthUser({ user }));
       if (callback) {

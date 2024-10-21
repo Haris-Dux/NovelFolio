@@ -24,7 +24,6 @@ export const createBookReview = async (
       "reviewText",
       "rating",
     ]);
-    console.log("title", title);
     const file = req.file;
     if (!file) throw new CustomError("Please provide a file", 400);
     const result = await uploadImageToFirebase(file, "Novel Folio");

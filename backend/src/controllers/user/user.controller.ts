@@ -19,7 +19,6 @@ export const fetchUserProfile = async (
       user: retrievedUser,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -39,7 +38,6 @@ export const fetchAuthUserProfile = async (
       user,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

@@ -3,7 +3,7 @@ import { authStorage } from "../../utils/browserStorage";
 import { Middleware } from "@reduxjs/toolkit";
 
 
-const authMiddleware:Middleware = (storeAPI) => (next) => (action:any) => {
+const authMiddleware:Middleware = () => (next) => (action:any) => {
   if (action.type === authUserLogout().type) {
     authStorage.logout();
   } else if (action.type === addAuthToken.type) {

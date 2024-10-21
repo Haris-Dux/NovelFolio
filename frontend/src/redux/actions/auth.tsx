@@ -46,7 +46,6 @@ export function signup(data:API.AuthData, callback:(error:string | null) => void
       dispatch(addAuthToken({ token: accessToken }));
       dispatch(getUserProfile());
     } catch (error:any) {
-      console.error(error.response.data);
 
       // Call callback if exists
       if (callback) {
@@ -68,7 +67,6 @@ export function refreshAccessToken() {
       dispatch(addAuthToken({ token: accessToken }));
     } catch (error) {
       dispatch(authUserLogout());
-      console.error(error);
     } finally {
       dispatch(authTokenLoading({ loading: false }));
     }

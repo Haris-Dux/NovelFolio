@@ -10,6 +10,7 @@ import {
 import { AuthenticationContext } from "../../../context/authenticationContext";
 import { authStorage } from "../../../utils/browserStorage";
 import { RootState } from "../../../redux/store";
+import toast from "react-hot-toast";
 
 let cmpntInitialized = false;
 let componentIsMounted = false;
@@ -24,8 +25,6 @@ const PrivateRouteGuard = () => {
 
   useEffect(() => {
     componentIsMounted = true;
-    console.log("Component IS initialized:)! ", cmpntInitialized);
-    console.log("How many time this runs:)! ", componentIsMounted);
 
     // We refresh token when component is mounted 1st time and if user is authenticated, i.e has token
     // Authenticated user when refreshes browser, token in redux store is cleared
@@ -33,10 +32,8 @@ const PrivateRouteGuard = () => {
     // `userIsAuthenticated` backs up redux store when it is cleared
     // Rehydrate redux store if it is missing and yet user is Authenticated
     if (!token && userIsAuthenticated) {
-      console.log("No TKN on redux store yet user is AUTH");
       if (cmpntInitialized) return setDisplayPage(true);
       // To prevent double firing in react strict mode development
-      console.log("So, refresh Access token!");
       cmpntInitialized = true;
       refreshAccessToken()
       
@@ -51,8 +48,9 @@ const PrivateRouteGuard = () => {
           // Add authenticated user to redux store
           dispatch(addAuthUser({ user }));
         })
-        .catch((error: any) => {
-          authStorage.logout()
+        .catch((error: any) => {     
+          authStorage.logout();
+          toast.error(error.response.data);
                 })
         .finally(() => {
           componentIsMounted && setDisplayPage(true);
@@ -63,7 +61,6 @@ const PrivateRouteGuard = () => {
 
     return () => {
       componentIsMounted = false;
-      console.log("CLEAN UP RAN: ", componentIsMounted);
     };
   }, []);
 
