@@ -1,6 +1,6 @@
 
 
-const allowlist = ["https://taskproject.site"];
+const allowlist = ["https://taskproject.site/","http://localhost:5173/"];
 
 const corsOptions = {
   origin: function (origin:string | undefined, callback:(err: Error | null, allow?: boolean) => void) {

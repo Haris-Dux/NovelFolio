@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { HiMiniBars3CenterLeft } from "react-icons/hi2";
 import { IoSearchOutline } from "react-icons/io5";
 import { HiOutlineUser } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
